@@ -4,13 +4,13 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 export default function Page() {
-    const [data, setData] = useState({name: ""});
+    const [data, setData] = useState({message: ""});
 
     useEffect(() => {
-        axios.get("/api/hello")
+        axios.get("/api/hello/backend")
           .then((res) => res.data)
           .then((data) => setData(data));
     }, []);
 
-    return <div>Hello, { data.name }</div>;
+    return <div>Hello, { data.message }</div>;
 }
