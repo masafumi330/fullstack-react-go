@@ -10,3 +10,16 @@ services:
       TZ: Asia/Tokyo
     ports:
       - 53306:3306
+  app-frontend:
+    build: ./dev/app/frontend
+    container_name: app-frontend
+    hostname: app-frontend
+    volumes:
+      - $PWD/dev/app/frontend:/app
+      - $PWD/dev/app/frontend/node_modules:/app/node_modules
+    working_dir: /app
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: development
+    command: sh -c "npm run dev"
