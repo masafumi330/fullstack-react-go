@@ -23,7 +23,6 @@ services:
       - 3000:3000
     environment:
       NODE_ENV: development
-    command: sh -c "npm run dev"
     stdin_open: true
   app-backend:
     build: ./dev/app/backend

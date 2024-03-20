@@ -4,4 +4,10 @@ FROM node:20-alpine
 WORKDIR /app/
 
 COPY ./package.json ./
-RUN npm install
+COPY src ./src
+
+# buid時に実行
+RUN yarn install
+
+# コンテナ起動時に実行
+CMD ["yarn", "dev"]
