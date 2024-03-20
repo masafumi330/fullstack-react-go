@@ -17,9 +17,25 @@ export default function Page() {
         setProducts(productsData);
     }, []);
 
+    const [showNewProductForm, setShowNewProductForm] = useState(false);
+    const handleShowNewProductForm = (event: React.MouseEvent<HTMLElement>) => {
+        event.preventDefault();
+        setShowNewProductForm(true);
+    };
+    const handleCancelNewProductForm = (event: React.MouseEvent<HTMLElement>) => {
+        event.preventDefault();
+        setShowNewProductForm(false);
+    }
+    const handleCreateNewProduct = (event: React.MouseEvent<HTMLElement>) => {
+        event.preventDefault();
+        // Request Post to Backent
+        setShowNewProductForm(false);
+    }
+
     return (
         <>
             <h2>商品一覧</h2>
+            <button onClick={handleShowNewProductForm}>商品を追加する</button>
             <table>
                 <thead>
                     <tr>
@@ -32,6 +48,25 @@ export default function Page() {
                     </tr>
                 </thead>
                 <tbody>
+                    {showNewProductForm ? (
+                        <tr>
+                            <td></td>
+                            <td>
+                                <input type="text" />
+                            </td>
+                            <td>
+                                <input type="number" />
+                            </td>
+                            <td>
+                                <input type="text" />
+                            </td>
+                            <td></td>
+                            <td>
+                                <button onClick={handleCancelNewProductForm}>キャンセル</button>
+                                <button onClick={handleCreateNewProduct}>登録</button>
+                            </td>
+                        </tr>
+                    ) : ""}
                     {products.map((product: any) => (
                         <tr key={product.id}>
                             <td>{product.id}</td>
