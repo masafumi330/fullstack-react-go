@@ -11,5 +11,8 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, masafumi!")
 	})
-	e.Logger.Fatal(e.Start(":3100"))
+	e.GET("/api/hello/backend", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]string{"message": "backend"})
+	})
+	e.Logger.Fatal(e.Start(":4000"))
 }
