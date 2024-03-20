@@ -11,6 +11,13 @@ type Product = {
     description: string;
 }
 
+type InputProduct = {
+    id: string;
+    name: string;
+    price: string;
+    description: string;
+}
+
 export default function Page() {
     const [products, setProducts] = useState<Product[]>(productsData);
     useEffect(() => {
@@ -37,6 +44,14 @@ export default function Page() {
     const handleEditProduct: any = (id: number) => {
         setShowNewProductForm(false);
         setEditingProduct(id);
+        const selectedProduct: Product = products.find((v) => v.id === id) as Product;
+        setInputProduct({
+            id: id.toString(),
+            name: selectedProduct.name,
+            price: String(selectedProduct.price),
+            description: selectedProduct.description
+
+        });
     };
     const handleCancelEditProduct: any = (id: number) => {
         setEditingProduct(0);
@@ -49,6 +64,20 @@ export default function Page() {
         // Request Delete to Backend
         setEditingProduct(0);
     };
+
+    // 登録データを保持
+    const [inputProduct, setInputProduct] = useState<InputProduct>({
+        id: "",
+        name: "",
+        price: "",
+        description: ""
+    });
+    // 登録データの値を入力値で更新
+    const handleInputProduct = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newInputProduct = { ...inputProduct, [event.target.name]: event.target.value };
+        setInputProduct(newInputProduct);
+    };
+
 
     return (
         <>
@@ -70,13 +99,13 @@ export default function Page() {
                         <tr>
                             <td></td>
                             <td>
-                                <input type="text" />
+                                <input type="text" onChange={handleInputProduct} />
                             </td>
                             <td>
-                                <input type="number" />
+                                <input type="number" onChange={handleInputProduct} />
                             </td>
                             <td>
-                                <input type="text" />
+                                <input type="text" onChange={handleInputProduct} />
                             </td>
                             <td></td>
                             <td>
@@ -89,9 +118,9 @@ export default function Page() {
                         editingProduct === product.id ? (
                             <tr key={product.id}>
                                 <td>{product.id}</td>
-                                <td><input type="text" defaultValue={product.name} /></td>
-                                <td><input type="number" defaultValue={product.price} /></td>
-                                <td><input type="text" defaultValue={product.description} /></td>
+                                <td><input type="text" value={inputProduct.name} name="name" onChange={handleInputProduct} /></td>
+                                <td><input type="number" value={inputProduct.price} name="price" onChange={handleInputProduct} /></td>
+                                <td><input type="text" value={inputProduct.description} name="description" onChange={handleInputProduct} /></td>
                                 <td></td>
                                 <td>
                                     <button onClick={() => handleCancelEditProduct(product.id)}>キャンセル</button>
