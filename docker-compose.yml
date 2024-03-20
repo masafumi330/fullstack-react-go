@@ -5,6 +5,8 @@ services:
       --collation-server=utf8mb4_0900_bin
       --transaction-isolation=READ-COMMITTED
     restart: always
+    container_name: app-db
+    hostname: app-db
     environment:
       MYSQL_ROOT_PASSWORD: password
       TZ: Asia/Tokyo
@@ -17,10 +19,18 @@ services:
     volumes:
       - $PWD/dev/app/frontend:/app
       - $PWD/dev/app/frontend/node_modules:/app/node_modules
-    working_dir: /app
     ports:
       - 3000:3000
     environment:
       NODE_ENV: development
     command: sh -c "npm run dev"
+    stdin_open: true
+  app-backend:
+    build: ./dev/app/backend
+    container_name: app-backend
+    hostname: app-backend
+    volumes:
+      - $PWD/dev/app/backend:/go/src/app
+    ports:
+      - 4000:4000
     stdin_open: true
