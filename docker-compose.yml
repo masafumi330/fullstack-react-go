@@ -8,6 +8,7 @@ services:
     container_name: app-db
     hostname: app-db
     environment:
+      MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: password
       TZ: Asia/Tokyo
     ports:

@@ -1,6 +1,6 @@
 # ref: https://qiita.com/frkawa/items/1dd12e19f10de034e0f5
 # Dockerfile
-FROM golang:1.19
+FROM golang:1.19-alpine
 
 # ログに出力する時間をJSTにするため、タイムゾーンを設定
 ENV TZ /usr/share/zoneinfo/Asia/Tokyo
