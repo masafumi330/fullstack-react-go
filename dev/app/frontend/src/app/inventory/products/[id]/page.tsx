@@ -1,5 +1,15 @@
 // 商品在庫画面
-import inventoryData from "./sample.json";
+'use client';
+import { useEffect, useState } from "react";
+import inventoryData from "./sample_inventory.json";
+import productsData from "../sample_products.json";
+
+type Product = {
+    id: number;
+    name: string;
+    price: number;
+    description: string;
+}
 
 type Inventory = {
     id: number;
@@ -12,6 +22,23 @@ type Inventory = {
 }
 
 export default function Page() {
+    const params = { id: 3 };
+
+    const [product, setProduct] = useState<Product>({ id: 0, name: "", price: 0, description: "" });
+    const [inventory, setInventory] = useState<Inventory[]>([]);
+
+
+    useEffect(() => {
+        const selectedProduct: Product = productsData.find(v => v.id == params.id) ?? {
+            id: 0,
+            name: "",
+            price: 0,
+            description: ""
+        };
+        setProduct(selectedProduct);
+        setInventory(inventoryData);
+    }, []);
+
     return (
         <>
             <h2>商品在庫</h2>
@@ -20,7 +47,7 @@ export default function Page() {
             <form action="">
                 <div>
                     <label htmlFor="">商品名</label>
-                    <span>コットン100%</span>
+                    <span>{product.name}</span>
                 </div>
                 <div>
                     <label htmlFor="">数量</label>
@@ -43,14 +70,14 @@ export default function Page() {
                     </tr>
                 </thead>
                 <tbody>
-                    {inventoryData.map((inventory: Inventory) => (
-                        <tr key={inventory.id}>
-                            <td>{inventory.type}</td>
-                            <td>{inventory.date}</td>
-                            <td>{inventory.unit}</td>
-                            <td>{inventory.quantity}</td>
-                            <td>{inventory.price}</td>
-                            <td>{inventory.inventory}</td>
+                    {inventory.map((i: Inventory) => (
+                        <tr key={i.id}>
+                            <td>{i.type}</td>
+                            <td>{i.date}</td>
+                            <td>{i.unit}</td>
+                            <td>{i.quantity}</td>
+                            <td>{i.price}</td>
+                            <td>{i.inventory}</td>
                         </tr>
                     ))}
                 </tbody>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import productsData from "./sample.json";
+import productsData from "./sample_products.json";
 
 type Product = {
     id: number;
