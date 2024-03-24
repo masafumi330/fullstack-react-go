@@ -2,150 +2,180 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import productsData from "./sample_products.json";
 
 type Product = {
-    id: number;
+    id: number | null;
     name: string;
     price: number;
     description: string;
-}
-
-type InputProduct = {
-    id: string;
-    name: string;
-    price: string;
-    description: string;
-}
+};
 
 export default function Page() {
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+    } = useForm();
+
+    // 読み込みデータを保持
     const [products, setProducts] = useState<Product[]>(productsData);
     useEffect(() => {
         setProducts(productsData);
     }, []);
 
-    const [showNewProductForm, setShowNewProductForm] = useState(false);
-
-    const handleShowNewProductForm = (event: React.MouseEvent<HTMLElement>) => {
-        event.preventDefault();
-        setShowNewProductForm(true);
-    };
-    const handleCancelNewProductForm = (event: React.MouseEvent<HTMLElement>) => {
-        event.preventDefault();
-        setShowNewProductForm(false);
-    }
-    const handleCreateNewProduct = (event: React.MouseEvent<HTMLElement>) => {
-        event.preventDefault();
-        // Request Post to Backent
-        setShowNewProductForm(false);
-    }
-
-    const [editingProduct, setEditingProduct] = useState(0);
-    const handleEditProduct: any = (id: number) => {
-        setShowNewProductForm(false);
-        setEditingProduct(id);
-        const selectedProduct: Product = products.find((v) => v.id === id) as Product;
-        setInputProduct({
-            id: id.toString(),
-            name: selectedProduct.name,
-            price: String(selectedProduct.price),
-            description: selectedProduct.description
-
+    // 新規作成
+    const handleShowNewProductForm = () => {
+        setId(null);
+        reset({
+            name: "",
+            price: "0",
+            description: ""
         });
     };
-    const handleCancelEditProduct: any = (id: number) => {
-        setEditingProduct(0);
+    const handleCancelNewProductForm = () => {
+        setId(0);
     }
-    const handleUpdateProduct: any = (id: number) => {
+    const handleCreateNewProduct = (product: Product) => {
+        setId(0);
+    }
+
+    // 更新
+    const handleEditProduct = (id: number | null) => {
+        const selectedProduct: Product = products.find((v) => v.id === id) as Product;
+        setId(selectedProduct.id);
+        reset({
+            name: selectedProduct.name,
+            price: selectedProduct.price,
+            description: selectedProduct.description
+        });
+    };
+    const handleCancelEditProduct = () => {
+        setId(0);
+    }
+    const handleUpdateProduct = (product: Product) => {
         // Request Put to Backend
-        setEditingProduct(0);
+        setId(0);
     };
-    const handleDeleteProduct: any = (id: number) => {
+
+    // 削除
+    const handleDeleteProduct = (id: number) => {
         // Request Delete to Backend
-        setEditingProduct(0);
+        setId(0);
     };
 
-    // 登録データを保持
-    const [inputProduct, setInputProduct] = useState<InputProduct>({
-        id: "",
-        name: "",
-        price: "",
-        description: ""
-    });
-    // 登録データの値を入力値で更新
-    const handleInputProduct = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newInputProduct = { ...inputProduct, [event.target.name]: event.target.value };
-        setInputProduct(newInputProduct);
+    const [id, setId] = useState<number | null>(0);
+    // submit時のactionを分岐させる
+    const [action, setAction] = useState<string>("");
+    const onSubmit = (event: any): void => {
+        const product: Product = {
+            id: id,
+            name: event.name,
+            price: Number(event.price),
+            description: event.description,
+        };
+        // actionによってHTTPメソッドと使用するパラメータを切り替える
+        switch (action) {
+            case "add":
+                // Request Post to Backend
+                handleCreateNewProduct(product);
+            case "update":
+                // Request Put to Backend
+                if (product.id === null) {
+                    return;
+                }
+                handleUpdateProduct(product);
+            case "delete":
+                // Request Delete to Backend
+                if (product.id === null) {
+                    return;
+                }
+                handleDeleteProduct(product.id);
+            default:
+                break;
+        }
     };
-
 
     return (
         <>
             <h2>商品一覧</h2>
-            <button onClick={handleShowNewProductForm}>商品を追加する</button>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>商品名</th>
-                        <th>価格</th>
-                        <th>説明</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {showNewProductForm ? (
+            <button type="button" onClick={handleShowNewProductForm}>商品を追加する</button>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <table>
+                    <thead>
                         <tr>
-                            <td></td>
-                            <td>
-                                <input type="text" onChange={handleInputProduct} />
-                            </td>
-                            <td>
-                                <input type="number" onChange={handleInputProduct} />
-                            </td>
-                            <td>
-                                <input type="text" onChange={handleInputProduct} />
-                            </td>
-                            <td></td>
-                            <td>
-                                <button onClick={handleCancelNewProductForm}>キャンセル</button>
-                                <button onClick={handleCreateNewProduct}>登録</button>
-                            </td>
+                            <th>ID</th>
+                            <th>商品名</th>
+                            <th>価格</th>
+                            <th>説明</th>
+                            <th></th>
+                            <th></th>
                         </tr>
-                    ) : ""}
-                    {products.map((product: any) => (
-                        editingProduct === product.id ? (
-                            <tr key={product.id}>
-                                <td>{product.id}</td>
-                                <td><input type="text" value={inputProduct.name} name="name" onChange={handleInputProduct} /></td>
-                                <td><input type="number" value={inputProduct.price} name="price" onChange={handleInputProduct} /></td>
-                                <td><input type="text" value={inputProduct.description} name="description" onChange={handleInputProduct} /></td>
+                    </thead>
+                    <tbody>
+                        {id === null ? (
+                            <tr>
                                 <td></td>
                                 <td>
-                                    <button onClick={() => handleCancelEditProduct(product.id)}>キャンセル</button>
-                                    <button onClick={() => handleUpdateProduct(product.id)}>更新</button>
-                                    <button onClick={() => handleDeleteProduct(product.id)}>削除</button>
-                                </td>
-                            </tr>
-                        ) : (
-                            <tr key={product.id}>
-                                <td>{product.id}</td>
-                                <td>{product.name}</td>
-                                <td>{product.price}</td>
-                                <td>{product.description}</td>
-                                <td>
-                                    <Link href={`/inventory/products/${product.id}`}>在庫処理</Link>
+                                    <input type="text" id="name" {...register("name", { required: true, maxLength: 100 })} />
+                                    {errors.name && (<div>100文字以内の商品名を入力してください</div>)}
                                 </td>
                                 <td>
-                                    <button onClick={() => handleEditProduct(product.id)}>更新/削除</button>
+                                    <input type="number" id="price" {...register("price", { required: true, min: 1, max: 99999 })} />
+                                    {errors.price && (<div>1から99999までの価格を入力してください</div>)}
+                                </td>
+                                <td>
+                                    <input type="text" id="description" {...register("description")} />
+                                </td>
+                                <td></td>
+                                <td>
+                                    <button type="button" onClick={() => handleCancelNewProductForm()}>キャンセル</button>
+                                    <button type="submit" onClick={() => setAction("add")}>登録</button>
                                 </td>
                             </tr>
-                        )
-                    ))}
-                </tbody>
-            </table>
+                        ) : ""}
+                        {products.map((product: any) =>
+                            id === product.id ? (
+                                <tr key={product.id}>
+                                    <td>{product.id}</td>
+                                    <td>
+                                        <input type="text" id="name" {...register("name", { required: true, maxLength: 100 })} />
+                                        {errors.name && (<div>100文字以内の商品名を入力してください</div>)}
+                                    </td>
+                                    <td>
+                                        <input type="number" id="price" {...register("price", { required: true, min: 1, max: 99999 })} />
+                                        {errors.price && (<div>1から99999までの価格を入力してください</div>)}
+                                    </td>
+                                    <td>
+                                        <input type="text" id="description" {...register("description")} />
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <button type="button" onClick={() => handleCancelEditProduct()}>キャンセル</button>
+                                        <button type="submit" onClick={() => setAction("update")}>更新</button>
+                                        <button type="submit" onClick={() => setAction("delete")}>削除</button>
+                                    </td>
+                                </tr>
+                            ) : (
+                                <tr key={product.id}>
+                                    <td>{product.id}</td>
+                                    <td>{product.name}</td>
+                                    <td>{product.price}</td>
+                                    <td>{product.description}</td>
+                                    <td>
+                                        <Link href={`/inventory/products/${product.id}`}>在庫処理</Link>
+                                    </td>
+                                    <td>
+                                        <button onClick={() => handleEditProduct(product.id)}>更新/削除</button>
+                                    </td>
+                                </tr>
+                            )
+                        )}
+                    </tbody>
+                </table>
+            </form>
         </>
-
-    )
+    );
 }

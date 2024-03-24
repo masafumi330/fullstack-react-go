@@ -21,9 +21,9 @@ type Inventory = {
     inventory: number;
 }
 
-export default function Page() {
-    const params = { id: 3 };
-
+export default function Page({ params }: {
+    params: { id: number },
+}) {
     const [product, setProduct] = useState<Product>({ id: 0, name: "", price: 0, description: "" });
     const [inventory, setInventory] = useState<Inventory[]>([]);
 
